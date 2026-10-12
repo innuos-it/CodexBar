@@ -132,3 +132,11 @@ codexbar --provider openrouter --all-accounts --format json --pretty
 - Credit values are cached on OpenRouter's side and may be up to 60 seconds stale when a Management API key is configured
 - OpenRouter uses a credit-based billing system where you pre-purchase credits
 - Rate limits depend on your credit balance (10+ credits = 1000 free model requests/day)
+
+## Daily free-model requests
+
+When the current-key endpoint returns `free_model_daily_requests`, CodexBar displays
+the account-wide daily request allowance, remaining requests, and its midnight UTC
+reset. This quota is separate from `usage_daily`, which measures dollar spend.
+Exhausted free requests therefore show a full quota even when today's spend is $0.
+Missing or malformed optional counters preserve valid credit and spending information.

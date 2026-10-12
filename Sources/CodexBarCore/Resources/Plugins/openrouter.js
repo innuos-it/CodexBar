@@ -325,6 +325,28 @@ defineProvider({
       }
     }
 
+    // Free-model requests are account-wide and independent of dollar spend.
+    let freeRequests = null;
+    const counter = keyData && keyData.free_model_daily_requests;
+    if (
+      counter &&
+      typeof counter === "object" &&
+      !Array.isArray(counter) &&
+      [counter.used, counter.limit, counter.remaining].every((value) => Number.isSafeInteger(value) && value >= 0) &&
+      counter.limit > 0 &&
+      counter.remaining <= counter.limit
+    ) {
+      freeRequests = counter;
+      const nextMidnight = new Date(ctx.date.now().getTime());
+      nextMidnight.setUTCHours(24, 0, 0, 0);
+      primary = {
+        usedPercent: ctx.pct(counter.used, counter.limit),
+        windowMinutes: 1440,
+        resetsAt: nextMidnight,
+        resetDescription: `${counter.used} / ${counter.limit} free requests · ${counter.remaining} remaining · resets 00:00 UTC`,
+      };
+    }
+
     let cost = null;
     // Capped keys already have a quota meter. Spend periods must come from their own
     // reported counters, never the quota helper's cumulative-usage fallback.
@@ -409,6 +431,17 @@ defineProvider({
             value: "Unavailable right now",
             secondaryValue: keyDegradation,
           },
+        ],
+      });
+    }
+
+    if (freeRequests) {
+      details.push({
+        title: "Daily free requests",
+        rows: [
+          { label: "Requests today", value: `${freeRequests.used} / ${freeRequests.limit}` },
+          { label: "Requests remaining", value: String(freeRequests.remaining) },
+          { label: "Daily reset", value: "00:00 UTC", secondaryValue: "Account-wide allowance" },
         ],
       });
     }
