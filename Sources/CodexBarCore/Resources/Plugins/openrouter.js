@@ -327,6 +327,7 @@ defineProvider({
 
     // Free-model requests are account-wide and independent of dollar spend.
     let freeRequests = null;
+    let freeRequestWindow = null;
     const counter = keyData && keyData.free_model_daily_requests;
     if (
       counter &&
@@ -339,7 +340,8 @@ defineProvider({
       freeRequests = counter;
       const nextMidnight = new Date(ctx.date.now().getTime());
       nextMidnight.setUTCHours(24, 0, 0, 0);
-      primary = {
+      primary = undefined;
+      freeRequestWindow = {
         usedPercent: ctx.pct(counter.used, counter.limit),
         windowMinutes: 1440,
         resetsAt: nextMidnight,
@@ -470,6 +472,15 @@ defineProvider({
     };
     if (cost) result.cost = cost;
     if (costUsage) result.costUsage = costUsage;
+    if (freeRequestWindow) {
+      result.extraWindows = [
+        {
+          id: "openrouter-free-daily",
+          title: `Daily free requests: ${freeRequests.used} / ${freeRequests.limit} used`,
+          window: freeRequestWindow,
+        },
+      ];
+    }
     if (primary) result.primary = primary;
     return result;
   },

@@ -33,9 +33,9 @@ test("exhausted free quota is visible independently of zero dollar spend", async
     usage_monthly: 0,
     free_model_daily_requests: { used: 50, limit: 50, remaining: 0 },
   });
-  assert.equal(result.primary.usedPercent, 100);
-  assert.equal(result.primary.resetsAt.toISOString(), "2026-10-13T00:00:00.000Z");
-  assert.equal(result.primary.resetDescription.includes("50 / 50 free requests"), true);
+  assert.equal(result.extraWindows[0].window.usedPercent, 100);
+  assert.equal(result.extraWindows[0].window.resetsAt.toISOString(), "2026-10-13T00:00:00.000Z");
+  assert.equal(result.extraWindows[0].window.resetDescription.includes("50 / 50 free requests"), true);
   assert.equal(result.cost.used, 0);
   assert.equal(result.cost.balance, 0);
   const rows = result.details.find((section) => section.title === "Daily free requests").rows;
@@ -43,8 +43,8 @@ test("exhausted free quota is visible independently of zero dollar spend", async
 });
 test("server limits are respected without assuming fifty requests", async () => {
   const result = await usage({ free_model_daily_requests: { used: 200, limit: 1000, remaining: 800 } });
-  assert.equal(result.primary.usedPercent, 20);
-  assert.equal(result.primary.resetDescription.includes("800 remaining"), true);
+  assert.equal(result.extraWindows[0].window.usedPercent, 20);
+  assert.equal(result.extraWindows[0].window.resetDescription.includes("800 remaining"), true);
 });
 test("missing and invalid optional counters preserve the spending cap", async () => {
   for (const counter of [

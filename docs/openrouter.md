@@ -140,3 +140,5 @@ the account-wide daily request allowance, remaining requests, and its midnight U
 reset. This quota is separate from `usage_daily`, which measures dollar spend.
 Exhausted free requests therefore show a full quota even when today's spend is $0.
 Missing or malformed optional counters preserve valid credit and spending information.
+
+The request allowance is exported as the named `openrouter-free-daily` window so web and Linux dashboards display an explicit daily-request label and counts. It does not reuse the built-in monetary `Credits` label. Spending cap amounts remain in the API-key detail rows.
